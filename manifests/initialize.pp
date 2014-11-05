@@ -54,11 +54,17 @@ define py_agent::initialize ($repo, $version, $service, $local_dir, $target, $ow
         require => Exec["pip installs-psutil"];
   }
 
+  exec { 'cleanup-python-agent':
+    path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+    command => "rm -rf /${local_dir};rm -rf ${target}/${service};",
+    require => Exec["pip installs-gittle"];
+  }
+
   exec {
     "creating_target_for_python_${name}":
       path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
       command => "mkdir -p ${target}",
-        require => Exec["pip installs-gittle"];
+      require => Exec["cleanup-python-agent"];
 
     "creating_local_package_repo_for_python_${name}":
       path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/java/bin/',
